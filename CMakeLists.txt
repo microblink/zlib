@@ -160,7 +160,8 @@ endif()
 
 if(UNIX)
     # On unix-like platforms the library is almost always called libz
-   set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
+    # MB patch set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
+   set_target_properties(zlibstatic PROPERTIES OUTPUT_NAME z)
    if(NOT APPLE AND NOT(CMAKE_SYSTEM_NAME STREQUAL AIX))
        # MB patch set_target_properties(zlib PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/zlib.map\"")
    endif()

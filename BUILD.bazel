@@ -1,4 +1,3 @@
-# Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/zlib/1.3.1.bcr.4/patches
 # Adapted from https://github.com/protocolbuffers/protobuf/blob/master/third_party/zlib.BUILD
 
 #  Copyright 2008 Google Inc.  All rights reserved.
@@ -116,7 +115,15 @@ cc_library(
         ":mingw_gcc_compiler": [
             "-fpermissive",
         ],
-        "@platforms//os:windows": [],
+        "@rules_cc//cc/compiler:msvc-cl": [
+            "/wd4127", # conditional expression is constant
+            "/wd4242", # possible loss of data
+            "/wd4244", # possible loss of data
+        ],
+        "@platforms//os:macos": [
+            "-Wno-unused-variable",
+            "-Wno-implicit-function-declaration",
+        ],
         "//conditions:default": [
             "-Wno-deprecated-non-prototype",
             "-Wno-unused-variable",
@@ -124,11 +131,30 @@ cc_library(
         ],
     }),
     includes = ["zlib/include/"],
+    local_defines = select({
+        "@platforms//os:windows": ["_CRT_NONSTDC_NO_WARNINGS"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "zlib-native",
+    linkopts = ["-lz"],
+    includes = ["."],
+    hdrs = [
+        "zlib.h",
+        "zconf.h",
+    ],
 )
 
 alias(
     name = "zlib",
-    actual = ":z",
+    actual = select({
+        "@platforms//os:android": ":zlib-native",
+        "@platforms//os:ios": ":zlib-native",
+        "@platforms//os:macos": ":zlib-native",
+        "//conditions:default": ":z",
+    }),
     visibility = ["//visibility:public"],
 )

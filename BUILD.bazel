@@ -153,7 +153,6 @@ alias(
     actual = select({
         "@platforms//os:android": ":zlib-native",
         "@platforms//os:ios": ":zlib-native",
-        "@platforms//os:macos": ":zlib-native",
         "//conditions:default": ":z",
     }),
     visibility = ["//visibility:public"],
